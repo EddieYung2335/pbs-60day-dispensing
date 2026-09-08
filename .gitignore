@@ -1,8 +1,0 @@
-data/raw/
-data/*.duckdb
-__pycache__/
-.venv/
-venv/
-.DS_Store
-.Rhistory
-.Rproj.user/
