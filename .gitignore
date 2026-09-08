@@ -1,0 +1,4 @@
+data/raw
+data/pbs.duckdb
+*.Rout
+reports/figures/*.png
