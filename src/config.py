@@ -1,7 +1,7 @@
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).parent.parent
-RAW = ROOT /"data" / "raw"
+ROOT = Path(__file__).resolve().parents[1]
+RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 DB = ROOT / "data" / "pbs.duckdb"
 REPORTS = ROOT / "reports"
