@@ -16,8 +16,9 @@ SUPPLY_DTYPES = {
     "MONTH_OF_SUPPLY": "int32",
     "ITEM_CODE": "string",
     "DRUG_TYPE": "string",
-    "PATIENT_CATEGORY": "string",
-    "PHARMACY_TYPE": "string",
+    "PATIENT_CAT": "string",
+    "PHRMCY_TYPE": "string",
+    "SCRIPT_TYPE": "string",
     "PRESCRIPTIONS": "int64",
     "PATIENT_CONTRIB": "float64",
     "GOVT_CONTRIB": "float64",
@@ -69,7 +70,7 @@ def group_key_expr():
     """
     Hold the group-key definition in exactly one place.
     """
-    return "upper(trim(drug_name)) || '|' || upper(trim(form_strength))"
+    return "upper(trim(drug_name)) || ' | ' || upper(trim(form_strength))"
 
 
 def build(db_path=DB):
@@ -90,8 +91,8 @@ def build(db_path=DB):
     item_map = read_item_map(RAW / MAP_FILE)
 
     con = duckdb.connect(str(db_path))
-    con.register("supply_df", supply)
-    con.register("item_map_df", item_map)
+    con.register("supply_df", supply) #The sales record
+    con.register("item_map_df", item_map) #The catelog
     con.execute("CREATE OR REPLACE TABLE supply AS SELECT * FROM supply_df")
     con.execute(
         f"""
