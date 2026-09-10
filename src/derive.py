@@ -2,7 +2,7 @@
 Derive which drug-from groups beame 60-day eligible, and when. 
 """
 
-from src.config import COMMUNITY_PHARMACY
+from src.config import COMMUNITY_PHARMACY, STAGE_MONTHS
 
 def build_item_months(con):
     """
@@ -52,5 +52,46 @@ def build_item_first(con):
         """
     )
 
+def build_group_stage(con):
+    """
+    Label each group with its stage and switch month. 
 
+    Args:
+        con: open Duckdb connection, holding `item_first`
+    
+    Returns:
+        nothing. side effect: creates table group_stage(group_key, group_first_month, stage, switch_month)
+    """
+    s1 = STAGE_MONTHS[1]
+    s2 = STAGE_MONTHS[2]
+    s3 = STAGE_MONTHS[3]
 
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE group_stage AS
+        WITH flags AS (
+            SELECT group_key,
+                   MAX(CASE WHEN first_month = {s1} THEN 1 ELSE 0 END) AS new_s1,
+                   MAX(CASE WHEN first_month = {s2} THEN 1 ELSE 0 END) AS new_s2,
+                   MAX(CASE WHEN first_month = {s3} THEN 1 ELSE 0 END) AS new_s3,
+                   MIN(first_month)                                    AS group_first_month
+            FROM item_first
+            GROUP BY 1
+        )
+        SELECT group_key,
+               group_first_month,
+               CASE
+                   WHEN new_s1 = 1 AND group_first_month < {s1} THEN 1
+                   WHEN new_s2 = 1 AND group_first_month < {s2} THEN 2
+                   WHEN new_s3 = 1 AND group_first_month < {s3} THEN 3
+                   ELSE 0
+               END AS stage,
+               CASE
+                   WHEN new_s1 = 1 AND group_first_month < {s1} THEN {s1}
+                   WHEN new_s2 = 1 AND group_first_month < {s2} THEN {s2}
+                   WHEN new_s3 = 1 AND group_first_month < {s3} THEN {s3}
+                   ELSE NULL
+               END AS switch_month
+        FROM flags      
+        """
+    )
