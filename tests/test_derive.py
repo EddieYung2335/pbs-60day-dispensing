@@ -2,7 +2,7 @@ import duckdb
 import pandas as pd
 import pytest
 
-from src.derive import build_item_first, build_item_months, build_group_stage
+from src.derive import apply_manual_drops, build_group_stage, build_item_first, build_item_months
 
 
 @pytest.fixture
@@ -112,3 +112,24 @@ def test_earliest_stage_wins_when_group_gains_codes_twice():
     build_item_first(c)
     build_group_stage(c)
     assert c.execute("SELECT stage FROM group_stage").fetchone()[0] == 1
+
+def test_manual_drop_resets_group_to_never_eligible(con):
+    build_item_months(con)
+    build_item_first(con)
+    build_group_stage(con)
+    apply_manual_drops(con, ["ATORVASTATIN | TABLET 40 MG"])
+    row = con.execute(
+        "SELECT stage, switch_month FROM group_stage"
+    ).fetchone()
+    assert row == (0, None)
+
+
+def test_manual_drop_ignores_keys_not_in_table(con):
+    build_item_months(con)
+    build_item_first(con)
+    build_group_stage(con)
+    apply_manual_drops(con, ["NOT A REAL GROUP | TABLET 1 MG"])
+    row = con.execute(
+        "SELECT stage, switch_month FROM group_stage"
+    ).fetchone()
+    assert row == (1, 202309)
