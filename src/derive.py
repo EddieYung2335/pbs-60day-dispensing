@@ -95,3 +95,30 @@ def build_group_stage(con):
         FROM flags      
         """
     )
+
+
+def apply_manual_drops(con, group_keys):
+    """
+    Reset hand-reviewed groups to never-eligible.
+
+    Some groups pass the stage rule but their new code is not a 60-day pack
+    (shortage imports, biologic re-listings). They were reviewed by hand in
+    checks_findings.md and are set back to stage 0 here.
+
+    Args:
+        con: open DuckDB connection, holding `group_stage`
+        group_keys: list of exact group_key strings to drop
+
+    Returns:
+        nothing. side effect: updates table group_stage in place
+    """
+
+    con.execute(
+        """
+        UPDATE group_stage
+        SET stage = 0,
+            switch_month = NULL
+        WHERE list_contains(?, group_key)
+        """,
+        [list(group_keys)],
+    )

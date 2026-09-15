@@ -73,3 +73,20 @@ Nine codes first dispensed in 202309 belong to groups that did not exist before 
 
 `drug_name` counts combination products (for example `AMLODIPINE + ATORVASTATIN`) as separate medicines. The government's counting convention is not published, so 91 vs 92 is treated as agreement, not an exact match. The 249 new codes fall into 246 groups because three groups gained two codes each:
 furosemide 20 mg, mesalazine 1.2 g prolonged release, and zanubrutinib 80 mg.
+
+## Guard flag review
+
+456 flags on 386 of 689 treated groups. Reviewed on 2026-09-15.
+
+- low_uptake (347): kept. 60-day switching was slow for all medicines
+  (median 7% in first 6 months even for unflagged groups), so a 5% threshold
+  catches real listings. Most flagged groups keep growing after a year.
+- no_substitution (109): kept. With a small 60-day share, the fall in 30-day
+  scripts is too small to see against normal growth.
+- Dropped 5 groups where the new code is not a 60-day pack:
+  - MORPHINE oral solution 100 mL and 500 mL (S19A): shortage import that
+    replaced the old pack.
+  - INFLIXIMAB 120 mg syringe: same price as old code, uptake 0.4%.
+  - ADALIMUMAB 40 mg 0.8 mL syringe: same price as old code, uptake under 3%.
+  - ZANUBRUTINIB 80 mg: two new codes at the same price as the old code.
+- Anchor after drops: about 246 items, 89 drugs. Still inside both bands.

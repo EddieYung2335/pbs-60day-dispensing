@@ -6,8 +6,8 @@ Fails loudly on a bad anchor.
 import sys
 
 from src.anchor import anchor_counts, check_anchor
-from src.config import DB, PROCESSED
-from src.derive import build_group_stage, build_item_first, build_item_months
+from src.config import DB, PROCESSED, DROP_LIST
+from src.derive import build_group_stage, build_item_first, build_item_months, apply_manual_drops
 from src.guards import run_guards
 from src.load import build
 
@@ -17,6 +17,7 @@ def main():
     build_item_months(con)
     build_item_first(con)
     build_group_stage(con)
+    apply_manual_drops(con, DROP_LIST)
 
     counts = anchor_counts(con)
     ok, msg = check_anchor(counts)
