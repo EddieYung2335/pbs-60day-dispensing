@@ -44,7 +44,7 @@ def main():
     """
     ).df()
     cohort.to_parquet(PROCESSED / "cohort.parquet", index=False)
-    flags.to_csv(PROCESSED / "guard_flags", index=False)
+    flags.to_csv(PROCESSED / "guard_flags.csv", index=False)
     print(f"wrote {len(cohort):,} groups to {PROCESSED / 'cohort.parquet'}")
 
 if __name__ == "__main__":
