@@ -31,7 +31,7 @@ def anchor_counts(con):
             COUNT(DISTINCT CASE WHEN f.first_month = {s1} THEN f.item_code END)
             AS new_items,
             COUNT(DISTINCT f.item_code)
-            AS all_items,'
+            AS all_items,
             COUNT(DISTINCT m.drug_name)
             AS drugs,
         FROM group_stage g
