@@ -2,3 +2,5 @@ data/raw
 data/pbs.duckdb
 *.Rout
 reports/figures/*.png
+__pycache__/
+*.pyc
