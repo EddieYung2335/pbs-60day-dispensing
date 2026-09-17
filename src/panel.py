@@ -1,7 +1,13 @@
-from src.config import (COMMUNITY_PHARMACY, CONCESSIONAL, GENERAL, PROCESSED,
-                    SUPPLY_MULTIPLIER)
+from src.config import (
+    COMMUNITY_PHARMACY,
+    CONCESSIONAL,
+    GENERAL,
+    PROCESSED,
+    SUPPLY_MULTIPLIER,
+)
 
 _NEVER = 999999
+
 
 def build_panel(con):
     conc = ", ".join(f"'{c}'" for c in CONCESSIONAL)
@@ -42,7 +48,6 @@ def build_panel(con):
     return df
 
 
-
 def main():
     import duckdb
     from src.config import DB
@@ -54,6 +59,7 @@ def main():
     print(f"panel rows: {len(panel):,}")
     print(f"groups:     {panel['group_key'].nunique():,}")
     print(f"months:     {panel['month'].min()} to {panel['month'].max()}")
+
 
 if __name__ == "__main__":
     main()
