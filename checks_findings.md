@@ -90,3 +90,40 @@ furosemide 20 mg, mesalazine 1.2 g prolonged release, and zanubrutinib 80 mg.
   - ADALIMUMAB 40 mg 0.8 mL syringe: same price as old code, uptake under 3%.
   - ZANUBRUTINIB 80 mg: two new codes at the same price as the old code.
 - Anchor after drops: about 246 items, 89 drugs. Still inside both bands.
+
+## Never-eligible controls (Arm B)
+
+Run: `python -m src.controls`
+
+Each Stage 1 group is matched to never-eligible (stage 0) groups on two things: ATC level-1 class and pre-period volume decile. Volume is the mean monthly `supply_months` up to 202308, so the policy itself cannot move a group into a different stratum. A stratum is kept only if it holds at least one group from each side. Stage 2 and 3 groups are not used here; they are the Arm A controls.
+
+| Measure | Count |
+|---|---|
+| Stage 1 groups | 244 |
+| Stage 1 groups matched | 244 |
+| Stage 1 groups with no available control | 0 |
+| Stage 0 groups available | 2,065 |
+| Stage 0 groups kept as controls | 199 |
+| Strata used | 21 |
+
+**Result: pass.** The plan treats Arm B as weak if more than 30% of Stage 1 groups go unmatched. None did, so the Arm B estimate covers all of Stage 1.
+
+The other 1,866 stage 0 groups sit in strata with no Stage 1 group, such as anti-infectives (J), and are left out.
+
+### Overlap is thin where Stage 1 is concentrated
+
+Stage 1 leans towards high-volume cardiovascular medicines: 168 of the 244 groups are in C-8, C-9 or C-10. Controls are scarce in that same corner.
+
+| Stratum | Treated | Controls |
+|---|---|---|
+| C-10 | 81 | 2 |
+| B-10 | 9 | 4 |
+| M-5 | 1 | 4 |
+
+91 treated groups (37%) are in strata with fewer than five controls. The C-10 comparison rests on two medicines, amiodarone 200 mg and sotalol 80 mg, both anti-arrhythmics. If either follows its own trend over 2023 to 2026, the Arm B estimate for a third of Stage 1 moves with it.
+
+This goes in the limitations section. It is not a reason to change the match: redrawing the strata after seeing these counts would undermine the check in the same way widening the anchor band would. Arm A gives an independent comparison for these groups up to March 2024.
+
+### Test data fix
+
+`test_stratum_combines_atc1_and_volume_decile` failed as written in the plan. With three groups, percentile ranks are 0.33 apart, so volumes of 1,000 and 900 land in deciles 10 and 7 and can never share a stratum. The test now uses 20 groups, which puts neighbouring ranks 0.05 apart, and also checks that a very different volume lands in a different decile. `assign_strata` was not changed.
