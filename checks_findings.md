@@ -127,3 +127,69 @@ This goes in the limitations section. It is not a reason to change the match: re
 ### Test data fix
 
 `test_stratum_combines_atc1_and_volume_decile` failed as written in the plan. With three groups, percentile ranks are 0.33 apart, so volumes of 1,000 and 900 land in deciles 10 and 7 and can never share a stratum. The test now uses 20 groups, which puts neighbouring ranks 0.05 apart, and also checks that a very different volume lands in a different decile. `assign_strata` was not changed.
+
+## Panel summary
+
+Run: `python -m src.checks`
+
+| Measure | Value |
+|---|---|
+| Panel rows | 354,290 |
+| Months | 202007 to 202606 |
+| Never-eligible groups | 2,065 |
+| Stage 1 groups | 244 |
+| Stage 2 groups | 213 |
+| Stage 3 groups | 227 |
+
+One row is a drug-form group, month, patient type and script type. The full list of guard flags is in `data/processed/guard_flags.csv`.
+
+## The January confounder
+
+The PBS safety net resets every January. Patients who reached the threshold the year before go back to paying full co-payments, so the split of cost between patient and government shifts at the start of every year, for treated and untreated medicines alike.
+
+Calendar-month profile, all groups and all years pooled:
+
+| Month | Govt cost per script ($) | Mean scripts per month (m) |
+|---|---|---|
+| Jan | 34.24 | 23.6 |
+| Feb | 33.82 | 23.7 |
+| Mar | 34.28 | 26.5 |
+| Apr | 33.73 | 25.3 |
+| May | 34.92 | 27.2 |
+| Jun | 35.26 | 26.4 |
+| Jul | 34.28 | 27.1 |
+| Aug | 34.07 | 27.2 |
+| Sep | 34.60 | 26.4 |
+| Oct | 34.98 | 27.1 |
+| Nov | 36.53 | 26.8 |
+| Dec | 37.22 | 29.4 |
+
+December to January, year by year:
+
+| January of | Govt cost total | Govt cost per script | Patient cost per script | Scripts |
+|---|---|---|---|---|
+| 2021 | -30.3% | -10.0% | +47.6% | -22.5% |
+| 2022 | -28.1% | -9.6% | +45.3% | -20.4% |
+| 2023 | -32.9% | -14.8% | +45.2% | -21.2% |
+| 2024 | -21.3% | -6.1% | +54.4% | -16.2% |
+| 2025 | -22.9% | -6.7% | +49.8% | -17.4% |
+| 2026 | -22.7% | -3.1% | +40.7% | -20.3% |
+
+The design notes expected government cost to fall about 45% each January. The data does not support that figure. Total government cost falls 21 to 33%, and most of that fall is volume: December is the busiest month of the year and January the quietest, which fits patients filling scripts before the reset. Per script, government cost falls only 3 to 15%. The figure close to 45% is the rise in patient cost per script, which is the other side of the same reset. The per-script fall is larger for concessional patients ($41.37 to $38.05) than for general patients ($29.76 to $28.81).
+
+The January swing is smaller from 2024 onward. The cause is not tested here, and because it starts after Stage 1 it is not read as evidence about the policy.
+
+How the estimation handles it:
+
+- The Sun-Abraham model carries calendar-month fixed effects explicitly (`| gid + month_of_year`).
+- Callaway-Sant'Anna has no month term. It compares treated and control groups in the same calendar month, so a January shift common to both cancels out. This relies on the reset moving treated and control medicines by the same proportion.
+
+The December peak matters for supply outcomes as well as cost, so no model is run on raw month-to-month changes without one of these two protections.
+
+## Known limitations of the data
+
+- No geography. The Date of Supply files have no state or region field, so regional differences in uptake cannot be studied. The concessional and general split is the only equity dimension available.
+- No quantity field. The files count prescriptions, not tablets or days. `supply_months` assumes a 60-day script supplies exactly twice a 30-day script (`SUPPLY_MULTIPLIER = 2.0`).
+- No patients. Every row is a monthly total. Nothing can be said about individual adherence, switching or stopping treatment, and a dispensed medicine is not necessarily a medicine taken.
+- Under-co-payment scripts carry no government cost. They are 31% of scripts in the panel and have `govt_contrib = 0` by construction, so cost results are reported with and without them.
+- Revisions. PBS revises historical files under the same file names, and the most recent months can still change as late claims are processed. The provenance table records which files these results were built on.
