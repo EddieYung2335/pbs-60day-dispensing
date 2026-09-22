@@ -1,6 +1,5 @@
 source("analysis/00_prep.R")
 suppressPackageStartupMessages({ library(ggplot2); library(readr) })
-# outputs land here; recursive = TRUE builds reports/ on the way
 dir.create("reports/figures", recursive = TRUE, showWarnings = FALSE)
 
 d <- prep_panel()
