@@ -1,10 +1,11 @@
 # Findings and recommendations
 
-**Status: incomplete, and the headline is descriptive rather than causal.** The parallel
-trends test in `analysis/03_event_study.R` fails. Stage 1 medicines were already moving
-relative to their controls before September 2023, so the difference-in-differences
-estimates below describe what happened alongside the policy and should not be read as
-what the policy caused. The detail is in Q2. Cost and equity are not yet estimated.
+**Status: the headline is descriptive rather than causal.** The parallel trends test in
+`analysis/03_event_study.R` fails. Stage 1 medicines were already moving relative to their
+controls before September 2023, so every estimate below describes what happened alongside
+the policy and should not be read as what the policy caused. The detail is in Q2. The
+placebo test passes, which rules out the method inventing effects but does not repair the
+comparison itself.
 
 **Scope:** Stage 1 PBS medicines (September 2023), community pharmacy dispensing only,
 concessional and general patients. Supply volume is inferred as
@@ -129,11 +130,88 @@ a design that survives a pre-trend test, and this one does not.
 
 ## Q3. What happened to patient and government cost?
 
-Not yet estimated. Output will land in `reports/estimates_cost.csv`.
+Cost per month of therapy fell on both sides of the ledger. These estimates come from the
+same design as Q2 and inherit the same failed assumption, so they describe what moved
+alongside the policy rather than what it caused.
+
+The outcome is dollars per supply-month, not a log, so the numbers read as dollars.
+Figures are in `reports/estimates_cost.csv`, estimated against the not-yet-treated arm.
+
+| Outcome | Patient type | Estimate | 95% CI |
+|---|---|---|---|
+| Patient cost | Concessional | -$0.53 | -0.58 to -0.47 |
+| Patient cost | General | -$3.32 | -3.50 to -3.14 |
+| Government cost | Concessional | -$160 | -234 to -87 |
+| Government cost | General | -$150 | -230 to -70 |
+
+The patient figures are straightforward. A general patient paid about $3.32 less per month
+of therapy, a concessional patient about 53 cents less. Both are small against the
+co-payments themselves, which is what a policy that halves the number of co-payments
+without changing their size would do.
+
+The government figures need care and should not be read as a budget number. `att_gt`
+averages across drug-form groups without weighting by dispensing volume, and cost per
+supply-month is extremely skewed. In the pre-period the median group-month cost the
+government about $40 for concessional patients while the mean was $527, with a maximum
+above $50,000. The volume-weighted cost per supply-month, which is what a budget line
+would show, is about $19. A $160 fall is therefore a statement about the average drug-form
+group, a set dominated by specialty medicines, and not about the cost of the medicines
+most people collect.
+
+Excluding under-co-payment scripts does not change this. Those rows carry no government
+contribution by construction, so a shift in patient mix could have produced a false cost
+effect on its own. The check in `reports/robustness.csv` puts the pooled estimate at -$177
+with all scripts and -$178 without them, so that concern does not bite here.
+
+**Recommend:** Do not quote the government-cost estimate as a saving to the budget. It
+answers a different question from the one a costing needs, and reporting it without the
+weighting caveat would overstate the per-script effect by more than an order of magnitude.
+A volume-weighted or logged cost model would answer the budget question, and is not part
+of this analysis.
 
 ## Q4. Did concessional and general patients benefit equally?
 
-Not yet estimated. Same model as Q3, split by patient category.
+No. General patients saved about six times more per month of therapy than concessional
+patients, $3.32 against $0.53.
+
+The mechanism is the co-payment structure rather than anything in the policy's design. A
+general patient pays the full co-payment on each script up to the safety net, so halving
+the number of scripts halves a larger amount. A concessional patient pays a much smaller
+co-payment, so the same halving saves less in absolute terms.
+
+Against their own baseline costs the two groups look closer than the raw gap suggests.
+Concessional patients paid about $4.69 per supply-month before the switch and general
+patients about $17.62, so the savings are roughly 11% and 19% of what each group was
+paying. The gap narrows but does not close.
+
+**Recommend:** State the equity result plainly rather than reporting an average across
+patient types. A policy presented as cost-of-living relief delivered most of its
+per-patient saving to the group with the higher co-payment. That is a defensible design
+choice, since general patients face the larger bill, but it is not what "relief for
+patients" implies, and an average over both groups hides it.
+
+## Robustness
+
+Three checks, all fixed before the results were seen, in `reports/robustness.csv`.
+
+**Placebo, passed.** Moving the switch twelve months early and discarding every month of
+real post-policy data gives +0.013 log points, with a confidence interval from -0.030 to
++0.056. Nothing happened on a date when nothing happened, which is what should occur. Had
+this produced an effect, the design would have been fitting noise and none of the numbers
+above would be worth reporting.
+
+**Supply multiplier, stable.** The multiplier converting a 60-day script into months of
+therapy is set to 2.0 throughout. At 1.8 the supply estimate is +0.011 and at 1.9 it is
++0.024, against +0.036 at 2.0. All three cross zero. The conclusion that supply did not
+fall does not depend on the exact multiplier.
+
+**Under-co-payment scripts, no effect on the result.** Covered under Q3.
+
+A passing placebo does not rescue the parallel trends failure. The two tests ask different
+questions. The placebo asks whether the method invents effects, and it does not. The event
+study asks whether treated and control medicines were comparable to begin with, and they
+were not. The second question is the one that decides whether these estimates carry a
+causal reading, and it is still answered no.
 
 ## What this analysis cannot tell you
 
