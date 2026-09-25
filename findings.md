@@ -130,7 +130,8 @@ a design that survives a pre-trend test, and this one does not.
 
 ## Q3. What happened to patient and government cost?
 
-Cost per month of therapy fell on both sides of the ledger. These estimates come from the
+Patient cost per month of therapy fell. The government-cost estimate is negative too, but
+it cannot be read the same way, for reasons set out below. These estimates come from the
 same design as Q2 and inherit the same failed assumption, so they describe what moved
 alongside the policy rather than what it caused.
 
@@ -151,12 +152,19 @@ without changing their size would do.
 
 The government figures need care and should not be read as a budget number. `att_gt`
 averages across drug-form groups without weighting by dispensing volume, and cost per
-supply-month is extremely skewed. In the pre-period the median group-month cost the
-government about $40 for concessional patients while the mean was $527, with a maximum
-above $50,000. The volume-weighted cost per supply-month, which is what a budget line
-would show, is about $19. A $160 fall is therefore a statement about the average drug-form
-group, a set dominated by specialty medicines, and not about the cost of the medicines
-most people collect.
+supply-month is extremely skewed. Before their switch, the median treated group-month cost
+the government about $24 per supply-month for concessional patients, while the mean was
+$110 and the most expensive group-month cost almost $10,000. The volume-weighted cost per
+supply-month, which is what a budget line would show, is about $21. These baselines are in
+`reports/cost_baseline.csv`, written by `analysis/04_cost.R`.
+
+The estimate is also larger than the quantity it is measured against. Averaged the same
+way as the estimate, a treated group cost the government $116 per supply-month for
+concessional patients before its switch. A $160 fall cannot be the treated medicines
+getting cheaper, since they had only $116 to lose. At least part of it has to be the
+not-yet-treated comparison medicines, themselves dominated by high-cost specialty items,
+becoming more expensive over the same months. The estimate describes a difference between
+two sets of expensive medicines, not the cost of the medicines most people collect.
 
 Excluding under-co-payment scripts does not change this. Those rows carry no government
 contribution by construction, so a shift in patient mix could have produced a false cost
@@ -165,7 +173,7 @@ with all scripts and -$178 without them, so that concern does not bite here.
 
 **Recommend:** Do not quote the government-cost estimate as a saving to the budget. It
 answers a different question from the one a costing needs, and reporting it without the
-weighting caveat would overstate the per-script effect by more than an order of magnitude.
+weighting caveat would overstate the effect on a typical script several times over.
 A volume-weighted or logged cost model would answer the budget question, and is not part
 of this analysis.
 
@@ -179,16 +187,18 @@ general patient pays the full co-payment on each script up to the safety net, so
 the number of scripts halves a larger amount. A concessional patient pays a much smaller
 co-payment, so the same halving saves less in absolute terms.
 
-Against their own baseline costs the two groups look closer than the raw gap suggests.
-Concessional patients paid about $4.69 per supply-month before the switch and general
-patients about $17.62, so the savings are roughly 11% and 19% of what each group was
-paying. The gap narrows but does not close.
+Against their own baseline costs the gap almost disappears. Measured the same way as the
+estimates, each medicine's pre-switch average then averaged across medicines, concessional
+patients paid $4.63 per supply-month before the switch and general patients $26.20
+(`reports/cost_baseline.csv`). The savings are about 11% and 13% of what each group was
+paying. In proportion to their bills the two groups gained almost equally. The sixfold gap
+is a dollar gap, and it comes from the size of the co-payment.
 
-**Recommend:** State the equity result plainly rather than reporting an average across
-patient types. A policy presented as cost-of-living relief delivered most of its
-per-patient saving to the group with the higher co-payment. That is a defensible design
-choice, since general patients face the larger bill, but it is not what "relief for
-patients" implies, and an average over both groups hides it.
+**Recommend:** State the equity result in both forms rather than reporting an average
+across patient types. In dollars, a policy presented as cost-of-living relief delivered
+most of its per-patient saving to the group with the higher co-payment. As a share of what
+each group was paying, the relief was close to even. Both are true, and an average over
+the two groups hides the first while a dollar figure alone overstates it.
 
 ## Robustness
 
