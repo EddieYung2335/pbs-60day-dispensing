@@ -60,7 +60,7 @@ Notes on the table:
 
 - The naive -3.4% is small because uptake was slow. Only 2.0% of Stage 1 dispensing used a
   60-day code in September 2023, rising to 11.1% by March 2024 and 25.0% by June 2026.
-- In both control arms supply falls 13 to 15 log points less than scripts do. That gap is
+- In both control arms supply falls 14 to 16 log points less than scripts do. That gap is
   arithmetic on the same dispensing events, so it survives the failed pre-trend test.
 - The two control arms disagree on the level of supply, by 2.05 standard errors. Neither is
   presented as the answer.
